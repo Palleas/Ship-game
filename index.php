@@ -11,15 +11,9 @@
     
     <p>Use left and right keys to turn, up to accelerate and space to fire.</p>
     
-    <div id="gamePanel">
-      <canvas id="stage" width="800" height="600"></canvas>
-    </div>
-    <div id="messages"></div>
+    <canvas id="stage" width="800" height="600"></canvas>
     
-    <?php if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1') : ?>
-      <script src="script/core.js"></script>
-    <?php else : ?>
-      <script src="script/core.min.js"></script>
-    <?php endif ?>
+    <script src="script/geom.js"></script>
+    <script src="script/core.js"></script>
   </body>
 </html>

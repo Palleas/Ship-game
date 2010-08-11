@@ -15,3 +15,12 @@ Rectangle.prototype.intersect = function(other)
 {
   return false;
 };
+
+
+MathUtils = {
+  deg2rad: function(deg)
+  {
+    
+  }
+,
+};
