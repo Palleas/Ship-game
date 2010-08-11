@@ -145,6 +145,7 @@ GameContext = function(stage)
     if (event.keyCode == KEY_UP && !clocks.moving)
     { 
       clocks.moving = setInterval(function() { draco.accelerate(); }, 20);
+      event.preventDefault();
     }
     
     // rotate
@@ -192,8 +193,8 @@ GameContext = function(stage)
   
   function onMouseMove(event)
   {
-    target.position.x = event.clientX - (window.innerWidth - stage.width) / 2;
-    target.position.y = event.clientY - (window.innerHeight - stage.height) / 2 + 55;
+    target.position.x = event.offsetX;
+    target.position.y = event.offsetY;
   }
   
   function resist()
@@ -203,7 +204,12 @@ GameContext = function(stage)
   
   function fire()
   {
-    var b = new Bullet(draco.rotation);
+    var dX, dY, angle, b;
+    dX = draco.position.x - target.position.x;
+    dY = draco.position.y - target.position.y;
+    angle = Math.atan2(dY, dX);
+    
+    b = new Bullet(angle * 180 / Math.PI - 90);
     b.position.x = draco.position.x;
     b.position.y = draco.position.y;
     b.clock = setInterval(function() { b.move() }, 20);
@@ -213,7 +219,6 @@ GameContext = function(stage)
   function draw()
   {
     clear();
-    
     // drawing bullets
     var bullet, now, bIndex;
     
@@ -235,6 +240,23 @@ GameContext = function(stage)
     now = new Date().getTime();
     fps = Math.floor(1000 / (now - lastDraw));
     lastDraw = now;
+  }
+  
+  function drawGun()
+  {
+    return;
+    context.save();
+    var dX, dY, angle;
+    dX = draco.position.x - target.position.x;
+    dY = draco.position.y - target.position.y;
+    //console.info((Math.atan(dY/dX) * 180) /  Math.PI);
+    context.translate(draco.position.x, draco.position.y);
+    context.rotate(Math.atan(dY/dX));
+    context.beginPath();
+    context.fillStyle = "rgba(0,0,255, 1)";
+    context.rect(0, 0, 5, 50);
+    context.fill();
+    context.restore();
   }
   
   function drawTarget()
@@ -271,6 +293,8 @@ GameContext = function(stage)
     context.rotate(draco.rotation * Math.PI / 180);
     context.drawImage(shipImage, - shipImage.width / 2, - shipImage.height / 2);
     context.restore();
+    
+    drawGun();
   }
   
   function drawBullet(bullet)
