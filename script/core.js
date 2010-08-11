@@ -1,5 +1,5 @@
 var Keys = {
-  ACCELERATE : 80,
+  ACCELERATE : 38,
   BRAKE : 40, 
   TURN_LEFT : 37,
   TURN_RIGHT : 39,
@@ -9,15 +9,77 @@ var Keys = {
 Universe = new function()
 {
   var stage = document.getElementById("stage"), 
-    hero, enemies, bullets, clocks;
+    hero, enemies = [], bullets = [], clocks = {},
+    actionKeys = [Keys.ACCELERATE, Keys.BRAKE, Keys.TURN_RIGHT, Keys.TURN_LEFT, Keys.FIRE];
+  
+  function keyUpHandler(event)
+  {
+    if (actionKeys.indexOf(event.keyCode) > -1)
+      event.preventDefault();
+    else
+      return;
+      
+    switch (event.keyCode)
+    {
+      case Keys.ACCELERATE:
+        console.info("Accelerate");
+        break;
+        
+      case Keys.BRAKE:
+        console.info("brake");
+        break;
+
+      case Keys.TURN_LEFT:
+        console.info("turn left");
+        break;
+
+      case Keys.TURN_RIGHT:
+        console.info("turn right");
+        break;
+
+      case Keys.FIRE:
+        break;
+    }
+  }
+  
+  function keyDownHandler(event)
+  {
+    if (actionKeys.indexOf(event.keyCode) > -1)
+      event.preventDefault();
+    else
+      return;
+      
+    switch (event.keyCode)
+    {
+      case Keys.ACCELERATE:
+        console.info("Accelerate");
+        break;
+        
+      case Keys.BRAKE:
+        console.info("brake");
+        break;
+
+      case Keys.TURN_LEFT:
+        console.info("turn left");
+        break;
+
+      case Keys.TURN_RIGHT:
+        console.info("turn right");
+        break;
+
+      case Keys.FIRE:
+        break;
+    }
+  }
   
   this.init = function()
   {
-    
     hero = new Ship();
     hero.position.x = stage.width / 2;
     hero.position.y = stage.height / 2;
-    console.info(hero);
+    
+    document.addEventListener("keyup", keyUpHandler, false);
+    document.addEventListener("keydown", keyDownHandler, false);
   }
 }
 
