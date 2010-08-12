@@ -8,9 +8,46 @@ var Keys = {
 
 Universe = new function()
 {
+  this.ANSWER = 42; // ha ! 
+  
   var stage = document.getElementById("stage"), 
+    background = document.getElementById("background"),
     hero, enemies = [], bullets = [], clocks = {},
     actionKeys = [Keys.ACCELERATE, Keys.BRAKE, Keys.TURN_RIGHT, Keys.TURN_LEFT, Keys.FIRE];
+  
+  function paintBackground()
+  {
+    var c, index, posX, posY;
+    // fill background w/ black
+
+    c = background.getContext("2d");
+    c.save();
+    c.fillStyle = "#000";
+    c.rect(0, 0, background.width, background.height);
+    c.fill();
+    c.restore();
+    
+    function drawStar(x, y)
+    {
+      c.strokeStyle = "rgba(255, 255, 255, "+ Math.random() +")";
+      c.save();
+      c.translate(x, y);
+      c.rotate(Math.random() * Math.PI);
+      c.moveTo(-2, 0);
+      c.lineTo(2, 0);
+      c.moveTo(0, -2);
+      c.lineTo(0, 2);
+      c.stroke();
+      c.restore();
+    }
+    
+    // add some stars
+    for (index = 0; index < Math.random() * 200; index++)
+    {
+      drawStar(Math.random() * background.width, Math.random() * background.height);
+    }
+  
+  }
   
   function keyUpHandler(event)
   {
@@ -74,6 +111,8 @@ Universe = new function()
   
   this.init = function()
   {
+    paintBackground();
+    
     hero = new Ship();
     hero.position.x = stage.width / 2;
     hero.position.y = stage.height / 2;

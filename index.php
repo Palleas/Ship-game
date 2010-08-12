@@ -10,8 +10,10 @@
     <h1>Ship experiment (Version 0.1)</h1>
     
     <p>Use left and right keys to turn, up to accelerate and space to fire.</p>
-    
-    <canvas id="stage" width="800" height="600"></canvas>
+    <div id="game">
+      <canvas id="background" width="800" height="600"></canvas>
+      <canvas id="stage" width="800" height="600"></canvas>
+    </div>
     
     <script src="script/geom.js"></script>
     <script src="script/core.js"></script>

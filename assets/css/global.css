@@ -13,37 +13,24 @@ body
   text-align:center;
 }
 
-h1
+#game
 {
-  text-align:center;
-  font: 3em Digital7;
-  margin-bottom:30px;
+  position:relative;
 }
 
-#gamePanel
+#background, #stage
 {
-  width: 800px;
-  margin:0 auto;
-  text-align:left;
-  border: 4px solid #333;
+  position:absolute;
+  top:0;
+  left:0;
 }
 
-#messages
+#background
 {
-  text-align:center;
+  z-index: 0;
 }
 
-#playLink:link, 
-#playLink:visited, 
-#playLink:hover, 
-#playLink:active
+#stage
 {
-  color:#ffcf00;
-  font: 3em Digital7;
-  text-decoration: none;
-}
-
-#fps
-{
-  font: 2em Digital7;
+  z-index: 1;
 }
