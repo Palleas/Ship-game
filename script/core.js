@@ -154,7 +154,7 @@ Universe = new function()
     var i, b, c = stage.getContext("2d");
     
     // hero's behavior
-    if (hero.firing) bullets.push(hero.fire());
+    if (hero.firing && hero.canShoot()) bullets.push(hero.fire());
     if (hero.accelerating) hero.accelerate();
     if (hero.braking) hero.brake();
     if (hero.turningLeft) hero.turnLeft();
@@ -219,10 +219,7 @@ var Bullet = function(position, rotation)
     c.save();
     c.translate(this.position.x, this.position.y);
     c.rotate((this.rotation * Math.PI) / 180);
-    c.fillStyle = "rgba(" + parseInt(Math.random() * 255) + ","
-      + parseInt(Math.random() * 255) + ","
-      + parseInt(Math.random() * 255) + ","
-      + "1)";
+    c.fillStyle = "rgba(0, 255, 0, 1)";
     
     c.beginPath();
     c.rect(-2, 0, 4, 10);
@@ -237,6 +234,7 @@ var Ship = function()
   this.life = 0;
   this.rotation = 0;
   this.position = new Point(0, 0);
+  this.lastShoot = 0;
   
   this.firing = false;
   this.accelerating = false;
@@ -267,7 +265,15 @@ var Ship = function()
   this.turnLeft = function() { this.turn("left"); };
   this.turnRight = function() { this.turn("right"); };
   
+  this.canShoot = function()
+  {
+    var d = new Date().getTime() - this.lastShoot;
+    console.info(d);
+    return d > 200;
+  }
+  
   this.fire = function() {
+    this.lastShoot = new Date().getTime();
     var b = new Bullet(this.position, this.rotation);
     return b;
   };
