@@ -15,6 +15,8 @@ Universe = new function()
     hero, enemies = [], bullets = [], clocks = {},
     actionKeys = [Keys.ACCELERATE, Keys.BRAKE, Keys.TURN_RIGHT, Keys.TURN_LEFT, Keys.FIRE];
   
+  options = {};
+  
   function paintBackground()
   {
     var c, index, posX, posY;
@@ -173,9 +175,13 @@ Universe = new function()
     hero = new Ship();
     hero.position.x = stage.width / 2;
     hero.position.y = stage.height / 2;
-    
-    document.addEventListener("keyup", keyUpHandler, false);
-    document.addEventListener("keydown", keyDownHandler, false);
+    hero.image = new Image();
+    hero.image.src = "assets/images/ship.png";
+    hero.image.addEventListener("load", function()
+    {
+      document.addEventListener("keyup", keyUpHandler, false);
+      document.addEventListener("keydown", keyDownHandler, false);
+    });
     
     setInterval(refresh, 1000 / 30)
   }
@@ -215,6 +221,8 @@ var Ship = function()
   this.turningLeft = false;
   this.turningRight = false;
   
+  this.image;
+  
   this.accelerate = function() 
   {
     var newSpeed = this.speed + 5;
@@ -244,10 +252,7 @@ var Ship = function()
     c.save();
     c.translate(this.position.x, this.position.y);
     c.rotate((this.rotation * Math.PI) / 180);
-    c.beginPath();
-    c.fillStyle = "rgba(255, 0, 0, 1)";
-    c.rect(0, 0, 20, 50);
-    c.fill();
+    c.drawImage(this.image, this.image.width * -0.5, this.image.height * -0.5);
     c.restore();
   }
 }
