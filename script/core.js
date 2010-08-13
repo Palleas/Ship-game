@@ -49,36 +49,6 @@ Universe = new function()
   
   }
   
-  function keyUpHandler(event)
-  {
-    if (actionKeys.indexOf(event.keyCode) > -1)
-      event.preventDefault();
-    else
-      return;
-      
-    switch (event.keyCode)
-    {
-      case Keys.ACCELERATE:
-        console.info("Accelerate");
-        break;
-        
-      case Keys.BRAKE:
-        console.info("brake");
-        break;
-
-      case Keys.TURN_LEFT:
-        console.info("turn left");
-        break;
-
-      case Keys.TURN_RIGHT:
-        console.info("turn right");
-        break;
-
-      case Keys.FIRE:
-        break;
-    }
-  }
-  
   function keyDownHandler(event)
   {
     if (actionKeys.indexOf(event.keyCode) > -1)
@@ -89,24 +59,111 @@ Universe = new function()
     switch (event.keyCode)
     {
       case Keys.ACCELERATE:
-        console.info("Accelerate");
+        if (!hero.accelerating)
+        {
+          hero.accelerating = true;
+        }
         break;
         
       case Keys.BRAKE:
-        console.info("brake");
+        if (!hero.braking)
+        {
+          hero.braking = true;
+        }
         break;
 
       case Keys.TURN_LEFT:
-        console.info("turn left");
+        if (!hero.turningLeft)
+        {
+          hero.turningLeft = true;
+        }
         break;
 
       case Keys.TURN_RIGHT:
-        console.info("turn right");
+        if (!hero.turningRight)
+        {
+          hero.turningRight = true;
+        }
         break;
 
       case Keys.FIRE:
+        if (!hero.firing)
+        {
+          hero.firing = true;
+        }
         break;
     }
+  }
+  
+  function keyUpHandler(event)
+  {
+    if (actionKeys.indexOf(event.keyCode) > -1)
+      event.preventDefault();
+    else
+      return;
+
+    switch (event.keyCode)
+    {
+      case Keys.ACCELERATE:
+        if (hero.accelerating)
+        {
+          hero.accelerating = false;
+        }
+        break;
+        
+      case Keys.BRAKE:
+        if (hero.braking)
+        {
+          hero.braking = false;
+        }
+        break;
+
+      case Keys.TURN_LEFT:
+        if (hero.turningLeft)
+        {
+          hero.turningLeft = false;
+        }
+        break;
+
+      case Keys.TURN_RIGHT:
+        if (hero.turningRight)
+        {
+          hero.turningRight = false;
+        }
+        break;
+
+      case Keys.FIRE:
+        if (!hero.firing)
+        {
+          hero.firing = true;
+        }
+        break;
+    }
+  }
+  
+  var repaint = function()
+  {
+    clear();
+    var c = stage.getContext("2d");
+    hero.draw(c);
+  }
+  
+  var clear = function()
+  {
+    stage.getContext("2d").clearRect(0, 0, stage.width, stage.height);
+  }
+  
+  var refresh = function()
+  {
+    // hero's behavior
+    if (hero.firing) bullets.push(hero.fire());
+    if (hero.accelerating) hero.accelerate();
+    if (hero.braking) hero.brake();
+    if (hero.turningLeft) hero.turnLeft();
+    if (hero.turningRight) hero.turnRight();
+    
+    // repaint
+    repaint();
   }
   
   this.init = function()
@@ -119,28 +176,57 @@ Universe = new function()
     
     document.addEventListener("keyup", keyUpHandler, false);
     document.addEventListener("keydown", keyDownHandler, false);
+    
+    setInterval(refresh, 1000 / 30)
   }
 }
 
-var Bullet = function()
+var Bullet = function(position, rotation)
 {
+  this.position = position;
+  this.rotation = rotation;
   
+  var xAcc, yAcc;
+  xAcc = Math.sin((rotation * Math.PI) / 180) * 10;
+  yAcc = -Math.cos((rotation * Math.PI) / 180) * 10;
+  
+  this.updateCoordinates = function()
+  {
+    this.position.x += xAcc;
+    this.position.y += yAcc;
+  }
+  
+  this.draw = function(context)
+  {
+    console.info(this);
+  }
 }
 
 var Ship = function()
 {
+  this.speed = 0;
   this.life = 0;
-  this.rotation = 15;
-  
+  this.rotation = 0;
   this.position = new Point(0, 0);
+  
+  this.firing = false;
+  this.accelerating = false;
+  this.braking = false;
+  this.turningLeft = false;
+  this.turningRight = false;
   
   this.accelerate = function() 
   {
+    var newSpeed = this.speed + 5;
+    this.speed = newSpeed <= 20 ? newSpeed : 0;
     this.updateCoordinates();
   };
   
   this.brake = function() 
   {
+    var newSpeed = this.speed - 2;
+    this.speed = newSpeed > 0 ? newSpeed : 0;
+    
     this.updateCoordinates();
   };
 
@@ -149,12 +235,20 @@ var Ship = function()
   this.turnRight = function() { this.turn("right"); };
   
   this.fire = function() {
-    
+    var b = new Bullet(this.position, this.rotation);
+    return b;
   };
   
-  this.draw = function(context)
+  this.draw = function(c)
   {
-    
+    c.save();
+    c.translate(this.position.x, this.position.y);
+    c.rotate((this.rotation * Math.PI) / 180);
+    c.beginPath();
+    c.fillStyle = "rgba(255, 0, 0, 1)";
+    c.rect(0, 0, 20, 50);
+    c.fill();
+    c.restore();
   }
 }
 Ship.prototype.updateCoordinates = function()
