@@ -135,19 +135,12 @@ Universe = new function()
         break;
 
       case Keys.FIRE:
-        if (!hero.firing)
+        if (hero.firing)
         {
-          hero.firing = true;
+          hero.firing = false;
         }
         break;
     }
-  }
-  
-  var repaint = function()
-  {
-    clear();
-    var c = stage.getContext("2d");
-    hero.draw(c);
   }
   
   var clear = function()
@@ -157,15 +150,34 @@ Universe = new function()
   
   var refresh = function()
   {
+    clear();
+    var i, b, c = stage.getContext("2d");
+    
     // hero's behavior
     if (hero.firing) bullets.push(hero.fire());
     if (hero.accelerating) hero.accelerate();
     if (hero.braking) hero.brake();
     if (hero.turningLeft) hero.turnLeft();
     if (hero.turningRight) hero.turnRight();
+    hero.updateCoordinates();
+    hero.slowDown(0.96);
+    hero.draw(c);
     
-    // repaint
-    repaint();
+    // bullets
+    for (i = 0; i < bullets.length; i++)
+    {
+      b = bullets[i];
+      b.updateCoordinates();
+      
+      if (b.position.x < 0 || b.position.x > stage.width
+        || b.position.y < 0 || b.position.y > stage.height)
+      {
+        bullets.splice(i, 1);
+        continue;
+      }
+      
+      b.draw(c);
+    }
   }
   
   this.init = function()
@@ -183,18 +195,18 @@ Universe = new function()
       document.addEventListener("keydown", keyDownHandler, false);
     });
     
-    setInterval(refresh, 1000 / 30)
+    setInterval(refresh, 1000 / 60);
   }
 }
 
 var Bullet = function(position, rotation)
 {
-  this.position = position;
+  this.position = new Point(position.x, position.y);
   this.rotation = rotation;
   
   var xAcc, yAcc;
-  xAcc = Math.sin((rotation * Math.PI) / 180) * 10;
-  yAcc = -Math.cos((rotation * Math.PI) / 180) * 10;
+  xAcc = Math.sin((rotation * Math.PI) / 180) * 15;
+  yAcc = -Math.cos((rotation * Math.PI) / 180) * 15;
   
   this.updateCoordinates = function()
   {
@@ -202,9 +214,20 @@ var Bullet = function(position, rotation)
     this.position.y += yAcc;
   }
   
-  this.draw = function(context)
+  this.draw = function(c)
   {
-    console.info(this);
+    c.save();
+    c.translate(this.position.x, this.position.y);
+    c.rotate((this.rotation * Math.PI) / 180);
+    c.fillStyle = "rgba(" + parseInt(Math.random() * 255) + ","
+      + parseInt(Math.random() * 255) + ","
+      + parseInt(Math.random() * 255) + ","
+      + "1)";
+    
+    c.beginPath();
+    c.rect(-2, 0, 4, 10);
+    c.fill();
+    c.restore();
   }
 }
 
@@ -221,24 +244,26 @@ var Ship = function()
   this.turningLeft = false;
   this.turningRight = false;
   
-  this.image;
+  this.image = null;
   
   this.accelerate = function() 
   {
-    var newSpeed = this.speed + 5;
-    this.speed = newSpeed <= 20 ? newSpeed : 0;
-    this.updateCoordinates();
+    var newSpeed = this.speed + 2;
+    this.speed = newSpeed <= 10 ? newSpeed : 10;
   };
+  
+  this.slowDown = function(factor)
+  {
+    this.speed *= factor;
+  }
   
   this.brake = function() 
   {
     var newSpeed = this.speed - 2;
     this.speed = newSpeed > 0 ? newSpeed : 0;
-    
-    this.updateCoordinates();
   };
 
-  this.turn = function(direction) { this.rotation += direction == "right" ? 5 : -5; };
+  this.turn = function(direction) { this.rotation += direction == "right" ? 8 : -8; };
   this.turnLeft = function() { this.turn("left"); };
   this.turnRight = function() { this.turn("right"); };
   
@@ -258,7 +283,11 @@ var Ship = function()
 }
 Ship.prototype.updateCoordinates = function()
 {
-  var speed, xAcc, yAcc;
+  var xAcc, yAcc;
+  xAcc = Math.sin((this.rotation * Math.PI) / 180) * this.speed;
+  yAcc = -Math.cos((this.rotation * Math.PI) / 180) * this.speed;
+  this.position.x += xAcc;
+  this.position.y += yAcc;
 }
 
 Universe.init();
