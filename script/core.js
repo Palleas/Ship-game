@@ -17,6 +17,19 @@ Universe = new function()
   
   options = {};
   
+  function addEnemy()
+  {
+    var p, e;
+    
+    p = new Point(Math.floor(Math.random() * stage.width),
+      Math.floor(Math.random() * stage.height));
+
+    e = new Enemy(1, p, Math.random() * Math.PI);
+
+    console.info(e.rotation, e.position.x, e.position.y);
+    enemies.push(e);
+  }
+  
   function paintBackground()
   {
     var c, index, posX, posY;
@@ -143,6 +156,14 @@ Universe = new function()
     }
   }
   
+  function isOutOfStage(i)
+  {
+    if (!i.position)
+      return false;
+      
+    return i.position.x < 0 || i.position.x > stage.width || i.position.y < 0 || i.position.y > stage.height;
+  }
+  
   var clear = function()
   {
     stage.getContext("2d").clearRect(0, 0, stage.width, stage.height);
@@ -151,7 +172,7 @@ Universe = new function()
   var refresh = function()
   {
     clear();
-    var i, b, c = stage.getContext("2d");
+    var i, b, e, c = stage.getContext("2d");
     
     // hero's behavior
     if (hero.firing && hero.canShoot()) bullets.push(hero.fire());
@@ -178,6 +199,20 @@ Universe = new function()
       
       b.draw(c);
     }
+    
+    for (i = 0; i < enemies.length; i++)
+    {
+      e = enemies[i];
+      e.updateCoordinates();
+      
+      if(isOutOfStage(e))
+      {
+        enemies.splice(i, 1);
+        continue;
+      }
+      
+      e.draw(c);
+    }
   }
   
   this.init = function()
@@ -195,6 +230,7 @@ Universe = new function()
       document.addEventListener("keydown", keyDownHandler, false);
     });
     
+    addEnemy();
     setInterval(refresh, 1000 / 60);
   }
 }
@@ -224,6 +260,37 @@ var Bullet = function(position, rotation)
     c.beginPath();
     c.rect(-2, 0, 4, 10);
     c.fill();
+    c.restore();
+  }
+}
+
+var Enemy = function(level, position, rotation)
+{
+  this.life = level * 5;
+  this.position = new Point(50, 50);
+  this.rotation = rotation;
+  
+  var xAcc, yAcc;
+  xAcc = Math.sin(this.rotation) * (5 * level);
+  yAcc = -Math.cos(this.rotation) * (5 * level);
+
+  this.updateCoordinates = function()
+  {
+    this.position.x += xAcc;
+    this.position.y += yAcc;
+  }
+  
+  this.draw = function(c)
+  {
+    c.save();
+    c.translate(this.position.x, this.position.y);
+    c.rotate(this.rotation);
+    
+    c.beginPath();
+    c.fillStyle = 'rgba(0, 0, 255, 1)';
+    c.arc(0, 0, 10, 0, Math.PI * 2, false);
+    c.fill();
+    
     c.restore();
   }
 }
@@ -268,7 +335,6 @@ var Ship = function()
   this.canShoot = function()
   {
     var d = new Date().getTime() - this.lastShoot;
-    console.info(d);
     return d > 200;
   }
   
