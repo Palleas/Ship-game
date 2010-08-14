@@ -26,8 +26,9 @@ Universe = new function()
 
     e = new Enemy(1, p, Math.random() * Math.PI);
 
-    console.info(e.rotation, e.position.x, e.position.y);
     enemies.push(e);
+    
+    setTimeout(addEnemy, Math.random() * 1500);
   }
   
   function paintBackground()
@@ -172,7 +173,7 @@ Universe = new function()
   var refresh = function()
   {
     clear();
-    var i, b, e, c = stage.getContext("2d");
+    var i, j, b, e, c = stage.getContext("2d");
     
     // hero's behavior
     if (hero.firing && hero.canShoot()) bullets.push(hero.fire());
@@ -200,6 +201,7 @@ Universe = new function()
       b.draw(c);
     }
     
+    // enemies
     for (i = 0; i < enemies.length; i++)
     {
       e = enemies[i];
@@ -209,6 +211,23 @@ Universe = new function()
       {
         enemies.splice(i, 1);
         continue;
+      }
+      
+      for (j = 0; j < bullets.length; j++)
+      {
+        b = bullets[j];
+
+        if (e.destroyed)
+        {
+          enemies.splice(j, 1);
+          continue;
+        }
+        else if (b.position.x > e.position.x && b.position.x < (e.position.x + 20)
+        && b.position.y > e.position.y && b.position.y < (e.position.y + 20)
+        && !e.destroyCount)
+        {
+          e.destroy();
+        } 
       }
       
       e.draw(c);
@@ -230,8 +249,8 @@ Universe = new function()
       document.addEventListener("keydown", keyDownHandler, false);
     });
     
-    addEnemy();
     setInterval(refresh, 1000 / 60);
+    setTimeout(addEnemy, Math.random() * 1500);
   }
 }
 
@@ -267,17 +286,25 @@ var Bullet = function(position, rotation)
 var Enemy = function(level, position, rotation)
 {
   this.life = level * 5;
-  this.position = new Point(50, 50);
+  this.position = position;
   this.rotation = rotation;
   
+  this.destroyCount = 0;
+  this.destroyed = false;
+
   var xAcc, yAcc;
-  xAcc = Math.sin(this.rotation) * (5 * level);
-  yAcc = -Math.cos(this.rotation) * (5 * level);
+  xAcc = Math.sin(this.rotation) * (2 * level);
+  yAcc = -Math.cos(this.rotation) * (2 * level);
 
   this.updateCoordinates = function()
   {
     this.position.x += xAcc;
     this.position.y += yAcc;
+  }
+  
+  this.destroy = function()
+  {
+    this.destroyCount = 30;
   }
   
   this.draw = function(c)
@@ -286,10 +313,36 @@ var Enemy = function(level, position, rotation)
     c.translate(this.position.x, this.position.y);
     c.rotate(this.rotation);
     
-    c.beginPath();
-    c.fillStyle = 'rgba(0, 0, 255, 1)';
-    c.arc(0, 0, 10, 0, Math.PI * 2, false);
-    c.fill();
+    if (this.destroyCount == 0 && !this.destroyed)
+    {
+      c.beginPath();
+      c.fillStyle = 'rgba(0, 0, 255, 1)';
+      c.arc(0, 0, 10, 0, Math.PI * 2, false);
+      c.fill();
+    }
+    else
+    {
+      this.destroyCount--;
+      if (this.destroyCount <= 0)
+      {
+        this.destroyed = true;
+      }
+      else
+      {
+        c.beginPath();
+        c.strokeStyle = 'rgba(0, 255, 0, ' + Math.random() + ')';
+        c.moveTo(0, -20);
+        c.lineTo(-5, -5);
+        c.lineTo(-20, 0);
+        c.lineTo(-5, 5);
+        c.lineTo(0, 20);
+        c.lineTo(5, 5);
+        c.lineTo(20, 0);
+        c.lineTo(5, -5);
+        c.lineTo(0, -20);
+        c.stroke();
+      }
+    }
     
     c.restore();
   }
