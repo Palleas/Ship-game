@@ -1,4 +1,6 @@
-var Keys = {
+var Ship, Enemy, Bullet, Universe, Keys;
+
+Keys = {
   ACCELERATE : 38,
   BRAKE : 40, 
   TURN_LEFT : 37,
@@ -12,7 +14,7 @@ Universe = new function()
   
   var stage = document.getElementById("stage"), 
     background = document.getElementById("background"),
-    hero, enemies = [], bullets = [], clocks = {},
+    hero, enemies = [], bullets = [],
     actionKeys = [Keys.ACCELERATE, Keys.BRAKE, Keys.TURN_RIGHT, Keys.TURN_LEFT, Keys.FIRE];
   
   options = {};
@@ -33,7 +35,7 @@ Universe = new function()
   
   function paintBackground()
   {
-    var c, index, posX, posY;
+    var c, i;
     // fill background w/ black
 
     c = background.getContext("2d");
@@ -58,7 +60,7 @@ Universe = new function()
     }
     
     // add some stars
-    for (index = 0; index < Math.random() * 200; index++)
+    for (i = 0; i < Math.random() * 200; i++)
     {
       drawStar(Math.random() * background.width, Math.random() * background.height);
     }
@@ -165,12 +167,12 @@ Universe = new function()
     return i.position.x < 0 || i.position.x > stage.width || i.position.y < 0 || i.position.y > stage.height;
   }
   
-  var clear = function()
+  function clear()
   {
     stage.getContext("2d").clearRect(0, 0, stage.width, stage.height);
   }
   
-  var refresh = function()
+  function refresh()
   {
     clear();
     var i, j, b, e, c = stage.getContext("2d");
@@ -254,7 +256,7 @@ Universe = new function()
   }
 }
 
-var Bullet = function(position, rotation)
+Bullet = function(position, rotation)
 {
   this.position = new Point(position.x, position.y);
   this.rotation = rotation;
@@ -283,7 +285,7 @@ var Bullet = function(position, rotation)
   }
 }
 
-var Enemy = function(level, position, rotation)
+Enemy = function(level, position, rotation)
 {
   this.life = level * 5;
   this.position = position;
@@ -348,8 +350,9 @@ var Enemy = function(level, position, rotation)
   }
 }
 
-var Ship = function()
+Ship = function()
 {
+  this.trail = [];
   this.speed = 0;
   this.life = 0;
   this.rotation = 0;
@@ -391,7 +394,8 @@ var Ship = function()
     return d > 200;
   }
   
-  this.fire = function() {
+  this.fire = function() 
+  {
     this.lastShoot = new Date().getTime();
     var b = new Bullet(this.position, this.rotation);
     return b;
@@ -399,6 +403,7 @@ var Ship = function()
   
   this.draw = function(c)
   {
+    // draw ship
     c.save();
     c.translate(this.position.x, this.position.y);
     c.rotate((this.rotation * Math.PI) / 180);
