@@ -1,5 +1,11 @@
 * {margin:0; padding:0; }
 
+a:link, a:visited, a:hover, a:active
+{
+  text-decoration: none;
+  color: #cccf00;
+}
+
 @font-face
 {
   font-family: 'Digital7';
@@ -15,7 +21,10 @@ body
 
 #game
 {
+  margin:50px auto;
   position:relative;
+  width:800px;
+  height:600px;
 }
 
 #background, #stage
@@ -33,4 +42,43 @@ body
 #stage
 {
   z-index: 1;
+}
+
+#modal
+{
+  background: #000;
+  opacity: .8;
+  z-index:3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#presentation
+{
+  padding:10px 0;
+  width: 500px;
+  height:250px;
+  border: 1px solid #fff;
+  position:absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -250px;
+  margin-top: -150px;
+  background: #222;
+  z-index: 4;
+  font-family: 'Digital7';
+}
+
+#presentation p
+{
+  line-height:1.1em;
+  margin:5px;
+}
+
+#playButton
+{
+  font-size:4em;
 }

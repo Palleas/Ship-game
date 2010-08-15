@@ -415,7 +415,21 @@ Ship.prototype.updateCoordinates = function()
   this.position.y += yAcc;
 }
 
-Universe.init();
+window.addEventListener("load", function(event)
+{
+  var playButton = document.getElementById("playButton"),
+  modal = document.getElementById("modal"),
+  presentation = document.getElementById("presentation");
+  
+  playButton.addEventListener("click", function(event)
+  {
+    modal.parentNode.removeChild(modal);
+    presentation.parentNode.removeChild(presentation);
+    
+    Universe.init();
+    return false;
+  }, false);
+}, false);
 
 
 
