@@ -245,11 +245,11 @@ Universe = new function()
     hero.position.y = stage.height / 2;
     hero.image = new Image();
     hero.image.src = "assets/images/ship.png";
-    hero.image.addEventListener("load", function()
+    hero.image.addEventListener("load", function(event)
     {
       document.addEventListener("keyup", keyUpHandler, false);
       document.addEventListener("keydown", keyDownHandler, false);
-    });
+    }, false);
     
     setInterval(refresh, 1000 / 60);
     setTimeout(addEnemy, Math.random() * 1500);
